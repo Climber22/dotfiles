@@ -196,3 +196,19 @@ export LSCOLORS=cxfxcxdxbxegedabagacad
 
 ### Escape overlap $PATH when tmux is loaded
 typeset -U path PATH
+
+##################### alias
+
+alias tmux='tmux -2'
+alias vi='nvim'
+alias vim='nvim'
+alias be='bundle exec'
+alias gs='git status'
+alias gdh='git diff HEAD'
+alias gbdm='git branch -d `git branch --merged | grep -v \* | grep -v master`'
+alias gcmt='git commit -m'
+alias gpu='git push -u origin `git rev-parse --abbrev-ref HEAD`'
+alias gh="open \`git remote get-url origin | sed -Ee 's#(ssh://)?(git@|git://)#http://#' -e 's@com:@com/@'\`"
+alias od='OVERCOMMIT_DISABLE=1'
+alias top='top -ocpu'
+alias ssh='if ! ssh-add -l >& /dev/null ; then ssh-add -t 12h ; fi ; ssh'
