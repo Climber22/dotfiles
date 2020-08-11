@@ -1,10 +1,14 @@
+[includeIf "gitdir:~/ghq/github.com/"]
+  path = ~/.gitconfig-primary
+
 [user]
   name = Shohei Ihaya
   email = ihaya.shohei@me.com
+
 [credenial]
   helper = osxkeychain
 [pull]
-  ff = only
+ ff = only
 [merge]
   ff = false
 [push]
@@ -32,4 +36,5 @@
         cmd = /Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
         trustExitCode = true
 [ghq]
-  root = .go/src
+  root = ~/ghq
+

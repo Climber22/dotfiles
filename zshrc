@@ -1,4 +1,4 @@
-#################### for neovim
+################### for neovim
 export XDG_CONFIG_HOME=$HOME/.config
 
 
@@ -147,8 +147,12 @@ eval "$(pyenv virtualenv-init -)"
 # export PATH=$HOME/.nodebrew/current/bin:$PATH
 #
 # enable nodenv
-export PATH="$HOME/.nodenv/bin:$PATH"
-eval "$(nodenv init -)"
+# export PATH="$HOME/.nodenv/bin:$PATH"
+# eval "$(nodenv init -)"
+
+# Use nvm
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" 
 
 
 #################### tmux
@@ -184,12 +188,6 @@ export PATH=$HOME/bin:$PATH
 #################### source the private setting files
 [ -f ~/dotfiles/zshrc.mine ] && source ~/dotfiles/zshrc.mine
 
-# The next line updates PATH for the Google Cloud SDK.
-if [ -f '/Users/shoheiihaya/google-cloud-sdk/path.zsh.inc' ]; then source '/Users/shoheiihaya/google-cloud-sdk/path.zsh.inc'; fi
-
-# The next line enables shell command completion for gcloud.
-if [ -f '/Users/shoheiihaya/google-cloud-sdk/completion.zsh.inc' ]; then source '/Users/shoheiihaya/google-cloud-sdk/completion.zsh.inc'; fi
-
 #################### ls custom
 alias ls='ls -G'
 export LSCOLORS=cxfxcxdxbxegedabagacad
@@ -206,9 +204,85 @@ alias be='bundle exec'
 alias gs='git status'
 alias gdh='git diff HEAD'
 alias gbdm='git branch -d `git branch --merged | grep -v \* | grep -v master`'
-alias gcmt='git commit -m'
+alias gcm='git commit -m'
 alias gpu='git push -u origin `git rev-parse --abbrev-ref HEAD`'
 alias gh="open \`git remote get-url origin | sed -Ee 's#(ssh://)?(git@|git://)#http://#' -e 's@com:@com/@'\`"
 alias od='OVERCOMMIT_DISABLE=1'
 alias top='top -ocpu'
 alias ssh='if ! ssh-add -l >& /dev/null ; then ssh-add -t 12h ; fi ; ssh'
+
+# === cool-peco init ===
+FPATH="$FPATH:/Users/shohei.ihaya/cool-peco"
+autoload -Uz cool-peco
+cool-peco
+# ======================
+#
+#
+##################### alias
+export PATH="$PATH:$HOME/flutter/bin"
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/Users/shohei.ihaya/Downloads/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/shohei.ihaya/Downloads/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/Users/shohei.ihaya/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/shohei.ihaya/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
+###-begin-npm-completion-###
+#
+# npm command completion script
+#
+# Installation: npm completion >> ~/.bashrc  (or ~/.zshrc)
+# Or, maybe: npm completion > /usr/local/etc/bash_completion.d/npm
+#
+
+if type complete &>/dev/null; then
+  _npm_completion () {
+    local words cword
+    if type _get_comp_words_by_ref &>/dev/null; then
+      _get_comp_words_by_ref -n = -n @ -n : -w words -i cword
+    else
+      cword="$COMP_CWORD"
+      words=("${COMP_WORDS[@]}")
+    fi
+
+    local si="$IFS"
+    IFS=$'\n' COMPREPLY=($(COMP_CWORD="$cword" \
+                           COMP_LINE="$COMP_LINE" \
+                           COMP_POINT="$COMP_POINT" \
+                           npm completion -- "${words[@]}" \
+                           2>/dev/null)) || return $?
+    IFS="$si"
+    if type __ltrim_colon_completions &>/dev/null; then
+      __ltrim_colon_completions "${words[cword]}"
+    fi
+  }
+  complete -o default -F _npm_completion npm
+elif type compdef &>/dev/null; then
+  _npm_completion() {
+    local si=$IFS
+    compadd -- $(COMP_CWORD=$((CURRENT-1)) \
+                 COMP_LINE=$BUFFER \
+                 COMP_POINT=0 \
+                 npm completion -- "${words[@]}" \
+                 2>/dev/null)
+    IFS=$si
+  }
+  compdef _npm_completion npm
+elif type compctl &>/dev/null; then
+  _npm_completion () {
+    local cword line point words si
+    read -Ac words
+    read -cn cword
+    let cword-=1
+    read -l line
+    read -ln point
+    si="$IFS"
+    IFS=$'\n' reply=($(COMP_CWORD="$cword" \
+                       COMP_LINE="$line" \
+                       COMP_POINT="$point" \
+                       npm completion -- "${words[@]}" \
+                       2>/dev/null)) || return $?
+    IFS="$si"
+  }
+  compctl -K _npm_completion npm
+fi
+###-end-npm-completion-###
